@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.contrib import messages
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from fire.models import Locations, Incident, FireStation, WeatherConditions, FireTruck, Firefighters
@@ -372,9 +373,9 @@ class FiretruckListView(ListView):
         query = self.request.GET.get("q")
         if query:
             qs = qs.filter(Q(truck_number__icontains=query) | 
-              Q(model__icontains=query) | 
-              Q(capacity__icontains=query) | 
-              Q(station__name__icontains=query))
+            Q(model__icontains=query) | 
+            Q(capacity__icontains=query) | 
+            Q(station__name__icontains=query))
 
         return qs
 
@@ -383,6 +384,7 @@ class FiretruckCreateView(CreateView):
     form_class = Firetruckform
     template_name = 'firetruck_add.html'
     success_url = reverse_lazy('fireTruck-list')
+    
 
 class FiretruckUpdateView(UpdateView):
     model = FireTruck
@@ -427,3 +429,8 @@ class FirefightersDeleteView(DeleteView):
     model = Firefighters
     template_name = 'firefighter_del.html'
     success_url = reverse_lazy('firefighters-list')
+    
+    
+    
+    
+#
