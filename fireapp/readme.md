@@ -90,6 +90,8 @@ python manage.py migrate
 ### Launch the server
 
 👥 Authors
+
+
 Charles Jazon Dorero
 
 Mark Oseas Eray
