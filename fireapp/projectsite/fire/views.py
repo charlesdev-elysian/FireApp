@@ -15,7 +15,7 @@ from django.db.models.functions import ExtractMonth
 from django.db.models import Count
 from datetime import datetime
 
-
+                                
 class HomePageView(ListView):
     model = Locations
     context_object_name = 'home'
