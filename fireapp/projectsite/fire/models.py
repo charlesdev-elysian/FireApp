@@ -82,6 +82,7 @@ class Firefighters(BaseModel):
     name = models.CharField(max_length=150)
     rank = models.CharField(max_length=150, null=True, blank=True)  # Make rank nullable
     experience_level = models.CharField(max_length=150)
+    
 
     def __str__(self):
         return self.name
