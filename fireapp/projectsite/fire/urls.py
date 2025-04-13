@@ -2,6 +2,7 @@ from django.urls import path
 from .views import (
     HomePageView,
     ChartView,
+    DashboardChartView,
     PieCountbySeverity,
     LineCountbyMonth,
     MultilineIncidentTop3Country,
@@ -46,7 +47,8 @@ urlpatterns = [
     path('', HomePageView.as_view(), name='home'),
     
     # Chart URLs
-    path('dashboard_chart/', ChartView.as_view(), name='dashboard-chart'),
+    path('dashboard_chart', ChartView.as_view(), name='dashboard-chart'),
+    path('dashboard_chart/', DashboardChartView.as_view(), name='dashboard-chart'),
     path('chart/', PieCountbySeverity, name='chart'),
     path('lineChart/', LineCountbyMonth, name='chart'),
     path('multilineChart/', MultilineIncidentTop3Country, name='chart'),

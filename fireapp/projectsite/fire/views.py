@@ -291,9 +291,9 @@ class FiretruckListView(ListView):
         query = self.request.GET.get("q")
         if query:
             qs = qs.filter(Q(truck_number__icontains=query) | 
-              Q(model__icontains=query) | 
-              Q(capacity__icontains=query) | 
-              Q(station__name__icontains=query))
+            Q(model__icontains=query) | 
+            Q(capacity__icontains=query) | 
+            Q(station__name__icontains=query))
 
         return qs
 
@@ -409,21 +409,20 @@ class BoatUpdateView(UpdateView):
 
 class IncidentListView(ListView):
     model = Incident
-    template_name = 'incident_list.html'
-    context_object_name = 'object_list'
-    paginate_by = 10
-
-    def get_queryset(self, *args, **kwargs):
-        qs = super().get_queryset(*args, **kwargs)
-        query = self.request.GET.get("q")
-        if query:
-            qs = qs.filter(
-                Q(description__icontains=query) |
-                Q(severity_level__icontains=query) |
-                Q(location__name__icontains=query) |  # Assuming Locations model has a 'name' field
-                Q(date_time__icontains=query)  # Assuming you want to search by date_time
+    template_name = 'incidents/incident_list.html'
+    context_object_name = 'incidents'
+    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        search_query = self.request.GET.get('q')
+        
+        if search_query:
+            queryset = queryset.filter(
+                Q(description__icontains=search_query) |
+                Q(severity_level__icontains=search_query) |
+                Q(location__name__icontains=search_query)
             )
-        return qs
+        return queryset
 
 class IncidentCreateView(CreateView):
     model = Incident
