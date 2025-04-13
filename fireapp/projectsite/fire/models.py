@@ -86,3 +86,14 @@ class Firefighters(BaseModel):
 
     def __str__(self):
         return self.name
+
+### Added the code for Boat model ###
+
+class Boat(BaseModel):
+    boat_name = models.CharField(max_length=150)
+    length = models.DecimalField(max_digits=10, decimal_places=2)
+    width = models.DecimalField(max_digits=10, decimal_places=2)
+    height = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return self.boat_name
