@@ -110,14 +110,14 @@
                 <div class="collapse" id="dashboard">
                   <ul class="nav nav-collapse">
                     <li>
-                      <a href="{% url 'dashboard-chart' %}">
-                        <span class="sub-item">Dashboard 1</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="{% url 'dashboard-chart' %}">
-                        <span class="sub-item">Dashboard 2</span>
-                      </a>
+                      <!-- In base.html, replace these lines: -->
+                          <a href="{% url 'dashboard-chart' %}">
+                            <span class="sub-item">Dashboard 1</span>
+                          </a>
+                          <!-- With: -->
+                        <a href="{% url 'dashboard-chart' %}">
+                            <span class="sub-item">Dashboard 1</span>
+                        </a>
                     </li>
                   </ul>
                 </div>

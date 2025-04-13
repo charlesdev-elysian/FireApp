@@ -1,45 +1,68 @@
-# fire/urls.py
-
-from django.contrib import admin
 from django.urls import path
-
-from django.urls import path
-from .views import (  # Use relative import since this is in the same app
-    HomePageView, ChartView, DashboardChartView,
-    PieCountbySeverity, LineCountbyMonth, MultilineIncidentTop3Country, multipleBarbySeverity,
-    map_station, fire_incident_map,
-    firestationListView, firestationCreateView, firestationUpdateView, firestationDeleteView,
-    IncidentListView, IncidentCreateView, IncidentUpdateView, IncidentDeleteView,
-    LocationListView, LocationCreateView, LocationUpdateView, LocationDeleteView,
-    ConditionListView, ConditionCreateView, ConditionUpdateView, ConditionDeleteView,
-    FiretruckListView, FiretruckCreateView, FiretruckUpdateView, FiretruckDeleteView,
-    FirefightersListView, FirefightersCreateView, FirefightersUpdateView, FirefightersDeleteView
+from .views import (
+    HomePageView,
+    ChartView,
+    PieCountbySeverity,
+    LineCountbyMonth,
+    MultilineIncidentTop3Country,
+    MultipleBarbySeverity,
+    map_station,
+    fire_incident_map,
+    # Fire Station Views
+    FireStationListView,
+    FireStationCreateView,
+    FireStationUpdateView,
+    FireStationDeleteView,
+    # Incident Views
+    IncidentListView,
+    IncidentCreateView,
+    IncidentUpdateView,
+    IncidentDeleteView,
+    # Location Views
+    LocationListView,
+    LocationCreateView,
+    LocationUpdateView,
+    LocationDeleteView,
+    # Weather Condition Views
+    ConditionListView,
+    ConditionCreateView,
+    ConditionUpdateView,
+    ConditionDeleteView,
+    # Firetruck Views
+    FiretruckListView,
+    FiretruckCreateView,
+    FiretruckUpdateView,
+    FiretruckDeleteView,
+    # Firefighter Views
+    FirefightersListView,
+    FirefightersCreateView,
+    FirefightersUpdateView,
+    FirefightersDeleteView
 )
 
 app_name = 'fire'
 
 urlpatterns = [
     path('', HomePageView.as_view(), name='home'),
-
-    # Charts
+    
+    # Chart URLs
     path('dashboard_chart/', ChartView.as_view(), name='dashboard-chart'),
-    path('dashboard/chart/', DashboardChartView.as_view(), name='dashboard-chart-alt'),
     path('chart/', PieCountbySeverity, name='chart'),
-    path('lineChart/', LineCountbyMonth, name='line-chart'),
-    path('multilineChart/', MultilineIncidentTop3Country, name='multiline-chart'),
-    path('multipleBarChart/', multipleBarbySeverity, name='multi-bar-chart'),
-
-    # Maps
+    path('lineChart/', LineCountbyMonth, name='chart'),
+    path('multilineChart/', MultilineIncidentTop3Country, name='chart'),
+    path('multipleBarChart/', MultipleBarbySeverity, name='chart'),
+    
+    # Map URLs
     path('station/', map_station, name='map-station'),
     path('fire_incident_map/', fire_incident_map, name='fire-incident-map'),
-
-    # Fire Stations
-    path('firestation_list/', firestationListView.as_view(), name='station-list'),
-    path('firestation_list/add', firestationCreateView.as_view(), name='firestation-add'),
-    path('firestation_list/<pk>', firestationUpdateView.as_view(), name='firestation-update'),
-    path('firestation_list/<pk>/delete/', firestationDeleteView.as_view(), name='firestation-delete'),
-
-    # Incidents
+    
+    # Fire Station URLs
+    path('firestation_list/', FireStationListView.as_view(), name='station-list'),
+    path('firestation_list/add/', FireStationCreateView.as_view(), name='firestation-add'),
+    path('firestation_list/<pk>/', FireStationUpdateView.as_view(), name='firestation-update'),
+    path('firestation_list/<pk>/delete/', FireStationDeleteView.as_view(), name='firestation-delete'),
+    
+    #  # Incidents
     path('incident_list/', IncidentListView.as_view(), name='incident-list'),
     path('incident_list/add', IncidentCreateView.as_view(), name='incident-add'),
     path('incident_list/<pk>', IncidentUpdateView.as_view(), name='incident-update'),
