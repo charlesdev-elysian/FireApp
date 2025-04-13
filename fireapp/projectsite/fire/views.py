@@ -404,3 +404,95 @@ class BoatUpdateView(UpdateView):
         
         messages.success(self.request, "Boat updated successfully!")
         return super().form_valid(form)
+    
+## Incident Views
+
+class IncidentListView(ListView):
+    model = Incident
+    template_name = 'incident_list.html'
+    context_object_name = 'object_list'
+    paginate_by = 10
+
+    def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+        query = self.request.GET.get("q")
+        if query:
+            qs = qs.filter(
+                Q(description__icontains=query) |
+                Q(severity_level__icontains=query) |
+                Q(location__name__icontains=query) |  # Assuming Locations model has a 'name' field
+                Q(date_time__icontains=query)  # Assuming you want to search by date_time
+            )
+        return qs
+
+class IncidentCreateView(CreateView):
+    model = Incident
+    form_class =  Incident_Form
+    template_name= 'incident_add.html'
+    success_url = reverse_lazy('incident-list')
+    
+class IncidentUpdateView(UpdateView):
+    model = Incident
+    form_class =  Incident_Form
+    template_name= 'incident_edit.html'
+    success_url = reverse_lazy('incident-list')
+    
+class IncidentDeleteView(DeleteView):
+    model = Incident
+    template_name= 'incident_del.html'
+    success_url = reverse_lazy('incident-list')
+    
+class LocationListView(ListView):
+    model = Locations
+    template_name = 'loc_list.html'
+    context_object_name = 'object_list'
+    paginate_by = 10
+
+    def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+        query = self.request.GET.get("q")
+        if query:
+            qs = qs.filter(
+                Q(name__icontains=query) |
+                Q(address__icontains=query) |
+                Q(city__icontains=query) |
+                Q(country__icontains=query)
+            )
+        return qs
+    
+## Location Views
+class LocationCreateView(CreateView):
+    model = Locations
+    form_class = Loc_Form
+    template_name= 'loc_add.html'
+    success_url = reverse_lazy('loc-list')
+    
+class LocationUpdateView(UpdateView):
+    model = Locations
+    form_class = Loc_Form
+    template_name= 'loc_edit.html'
+    success_url = reverse_lazy('loc-list')
+    
+class LocationDeleteView(DeleteView):
+    model = Locations
+    template_name= 'loc_del.html'
+    success_url = reverse_lazy('loc-list')
+
+class ConditionListView(ListView):
+    model = WeatherConditions
+    context_object_name = 'object_list'
+    template_name = 'weather_list.html'
+    paginate_by = 10
+
+    def get_queryset(self, *args, **kwargs):
+        qs = super(ConditionListView, self).get_queryset(*args, **kwargs)
+        query = self.request.GET.get('q')
+        if query:
+            qs = qs.filter(
+                Q(incident__location__name__icontains=query) | 
+                Q(temperature__icontains=query) |
+                Q(humidity__icontains=query) |
+                Q(wind_speed__icontains=query) |
+                Q(weather_description__icontains=query)
+            )
+        return qs
