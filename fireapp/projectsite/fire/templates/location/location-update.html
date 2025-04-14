@@ -5,7 +5,8 @@
     <div class="card">
         <div class="card-header bg-primary text-white">
             <h4 class="mb-0">
-                <i class="fas fa-map-marker-alt me-2"></i>Add New Location
+                <i class="fas fa-edit me-2"></i>Edit Location
+                <small class="text-muted">#{{ object.id }}</small>
             </h4>
         </div>
         <div class="card-body">
@@ -73,12 +74,19 @@
 
                 <!-- Form Buttons -->
                 <div class="d-flex justify-content-between mt-4">
-                    <a href="{% url 'loc-list' %}" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left me-1"></i> Back to List
-                    </a>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-1"></i> Save Location
-                    </button>
+                    <div>
+                        <a href="{% url 'location-update' object.id %}" class="btn btn-outline-secondary me-2">
+                            <i class="fas fa-eye me-1"></i> View Details
+                        </a>
+                        <a href="{% url 'loc-list' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-1"></i> Back to List
+                        </a>
+                    </div>
+                    <div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i> Save Changes
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
