@@ -1,0 +1,85 @@
+{% extends "base.html" %}  <!-- Extends your base template if you have one -->
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Add New Incident</h2>
+    
+    <form method="post" class="needs-validation" novalidate>
+        {% csrf_token %}
+        
+        <!-- Form Fields -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row">
+                    <!-- Left Column -->
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">
+                                Description
+                            </label>
+                            {{ form.description }}
+                            <div class="invalid-feedback">
+                                Please provide a description.
+                            </div>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="{{ form.severity_level.id_for_label }}" class="form-label">
+                                Severity Level
+                            </label>
+                            {{ form.severity_level }}
+                        </div>
+                    </div>
+                    
+                    <!-- Right Column -->
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="{{ form.location.id_for_label }}" class="form-label">
+                                Location
+                            </label>
+                            {{ form.location }}
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="{{ form.date_time.id_for_label }}" class="form-label">
+                                Date/Time
+                            </label>
+                            {{ form.date_time }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Buttons -->
+        <div class="d-flex justify-content-between">
+            <a href="{% url 'incident-list' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Cancel
+            </a>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Save Incident
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Optional: Add form validation script -->
+<script>
+// Example client-side validation
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+</script>
+{% endblock %}

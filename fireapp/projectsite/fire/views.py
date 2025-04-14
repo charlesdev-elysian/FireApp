@@ -430,7 +430,7 @@ class IncidentListView(ListView):
 class IncidentCreateView(CreateView):
     model = Incident
     form_class = Incident_Form
-    template_name = 'incident/incident_add.html'
+    template_name = 'incident/incident-add.html'
     success_url = reverse_lazy('incident-list')
 
     def form_valid(self, form):
@@ -441,7 +441,7 @@ class IncidentCreateView(CreateView):
 class IncidentUpdateView(UpdateView):
     model = Incident
     form_class = Incident_Form
-    template_name = 'incident/incident_edit.html'
+    template_name = 'incident/incident-update.html'
     success_url = reverse_lazy('incident-list')
 
     def form_valid(self, form):
@@ -451,13 +451,20 @@ class IncidentUpdateView(UpdateView):
 
 class IncidentDeleteView(DeleteView):
     model = Incident
-    template_name= 'incident_del.html'
+    template_name = 'incident/incident_del.html'  # Note the folder structure
     success_url = reverse_lazy('incident-list')
+    context_object_name = 'incident'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = f"Delete Incident #{self.object.id}"
+        return context
 
     def form_valid(self, form):
-        description = form.instance.description[:50] + "..." if len(form.instance.description) > 50 else form.instance.description
-        messages.success(self.request, f'Incident "{description}" deleted successfully!')
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        description = self.object.description[:50] + "..." if len(self.object.description) > 50 else self.object.description
+        messages.success(self.request, f'Successfully deleted incident: "{description}"')
+        return response
 
 
 # ======================
