@@ -1,32 +1,23 @@
 from django.shortcuts import render
-from django.contrib import messages
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView, TemplateView
-from django.urls import reverse_lazy
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
 from django.db.models import Q
+from django.urls import reverse_lazy
+
+from django.contrib import messages
+
+from fire.models import Locations, Incident, FireStation, WeatherConditions, FireTruck, Firefighters, Boat
+from fire.forms import Loc_Form, Incident_Form, FireStationzForm, Weather_condition, Firetruckform, FirefightersForm
+from django.db.models.query import QuerySet
+from django.db.models import Q
+
+
+from django.views.generic.list import ListView
 from django.db import connection
 from django.http import JsonResponse
+from django.db.models.functions import ExtractMonth
+
+from django.db.models import Count
 from datetime import datetime
-
-# Models
-from .models import (
-    Locations, 
-    Incident, 
-    FireStation, 
-    WeatherConditions, 
-    FireTruck, 
-    Firefighters,
-    Boat
-)
-
-# Forms
-from .forms import (
-    Loc_Form,
-    Incident_Form,
-    FireStationzForm,
-    Weather_condition,
-    Firetruckform,
-    FirefightersForm
-)
 
 # ======================
 # MAIN VIEWS
@@ -35,21 +26,16 @@ class HomePageView(ListView):
     model = Locations
     context_object_name = 'home'
     template_name = "home.html"
-
-class ChartView(TemplateView):
+    
+class ChartView(ListView):
     template_name = 'chart.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context
 
-class DashboardChartView(TemplateView):
-    template_name = 'dashboard/chart.html'
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['page_title'] = "Dashboard Charts"
-        return context
+    def get_queryset(self, *args, **kwargs):
+        pass
 
 # ======================
 # CHART DATA VIEWS
@@ -205,43 +191,69 @@ class BaseUpdateView(UpdateView):
     def form_valid(self, form):
         messages.success(self.request, f"{self.model._meta.verbose_name} updated successfully!")
         return super().form_valid(form)
-
+    
 class BaseDeleteView(DeleteView):
-    def delete(self, request, *args, **kwargs):
+    def form_valid(self, form):
         messages.success(self.request, f"{self.model._meta.verbose_name} deleted successfully!")
-        return super().delete(request, *args, **kwargs)
+        return super().form_valid(form)
 
 # ======================
 # FIRE STATION VIEWS
 # ======================
-class FireStationListView(BaseListView):
+class FireStationListView(ListView):
     model = FireStation
     template_name = 'firestation/station_list.html'
+    context_object_name = 'object_list'
+    paginate_by = 10
     
-    def get_search_filter(self, query):
-        return (Q(name__icontains=query) | 
+    def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+        query = self.request.GET.get("q")
+        if query:
+            qs = qs.filter(
+                Q(name__icontains=query) |
                 Q(address__icontains=query) |
-                Q(city__icontains=query) | 
-                Q(country__icontains=query))
+                Q(city__icontains=query) |
+                Q(country__icontains=query)
+            )
+        return qs
 
-class FireStationCreateView(BaseCreateView):
+class FireStationCreateView(CreateView):
     model = FireStation
     form_class = FireStationzForm
-    template_name = 'firestation/station_form.html'
+    template_name = 'firestation/station_add.html'
     success_url = reverse_lazy('station-list')
 
-class FireStationUpdateView(BaseUpdateView):
+    def form_valid(self, form):
+        station_name = form.instance.name
+        messages.success(self.request, f'Fire Station "{station_name}" created successfully!')
+        return super().form_valid(form)
+
+class FireStationUpdateView(UpdateView):
     model = FireStation
     form_class = FireStationzForm
-    template_name = 'firestation/station_form.html'
+    template_name = 'firestation/station_edit.html'
     success_url = reverse_lazy('station-list')
 
-class FireStationDeleteView(BaseDeleteView):
+    def form_valid(self, form):
+        station_name = form.instance.name
+        messages.success(self.request, f'Fire Station "{station_name}" updated successfully!')
+        return super().form_valid(form)
+    
+class FireStationDeleteView(DeleteView):
     model = FireStation
-    template_name = 'firestation/station_confirm_delete.html'
+    template_name= 'station_del.html'
     success_url = reverse_lazy('station-list')
     
-## Weather Condition Views
+    def form_valid(self, form):
+        station_name = form.instance.name
+        messages.success(self.request, f'Fire Station "{station_name}" deleted successfully!')
+        return super().form_valid(form)
+    
+
+# ======================
+# WEATHER CONDITION VIEWS
+# ======================
 class ConditionListView(ListView):
     model = WeatherConditions
     context_object_name = 'object_list'
@@ -260,25 +272,41 @@ class ConditionListView(ListView):
                 Q(weather_description__icontains=query)
             )
         return qs
-    
+
 class ConditionCreateView(CreateView):
     model = WeatherConditions
     form_class = Weather_condition
-    template_name = 'weather_add.html'
+    template_name = 'weather/weather_add.html'
     success_url = reverse_lazy('weather-list')
+
+    def form_valid(self, form):
+        location = form.instance.incident.location.name
+        messages.success(self.request, f'Weather condition for "{location}" created successfully!')
+        return super().form_valid(form)
 
 class ConditionUpdateView(UpdateView):
     model = WeatherConditions
     form_class = Weather_condition
-    template_name = 'weather_edit.html'
+    template_name = 'weather/weather_form.html'
     success_url = reverse_lazy('weather-list')
+
+    def form_valid(self, form):
+        location = form.instance.incident.location.name
+        messages.success(self.request, f'Weather condition for "{location}" updated successfully!')
+        return super().form_valid(form)
 
 class ConditionDeleteView(DeleteView):
     model = WeatherConditions
     template_name = 'weather_del.html'
     success_url = reverse_lazy('weather-list')
-
-## Firetruck Views
+    
+def form_valid(self, form):
+        location = form.instance.incident.location.name
+        messages.success(self.request, f'Weather condition for "{location}" deleted successfully!')
+        return super().form_valid(form)
+# ======================
+# FIRETRUCK VIEWS
+# ======================
 class FiretruckListView(ListView):
     model = FireTruck
     context_object_name = 'firetruck'
@@ -300,22 +328,38 @@ class FiretruckListView(ListView):
 class FiretruckCreateView(CreateView):
     model = FireTruck
     form_class = Firetruckform
-    template_name = 'firetruck_add.html'
+    template_name = 'firetruck/firetruck_add.html'
     success_url = reverse_lazy('fireTruck-list')
+
+    def form_valid(self, form):
+        truck_number = form.instance.truck_number
+        messages.success(self.request, f'Fire Truck #{truck_number} created successfully!')
+        return super().form_valid(form)
 
 class FiretruckUpdateView(UpdateView):
     model = FireTruck
     form_class = Firetruckform
-    template_name = 'firetruck_edit.html'
+    template_name = 'firetruck/firetruck_edit.html'
     success_url = reverse_lazy('fireTruck-list')
 
+    def form_valid(self, form):
+        truck_number = form.instance.truck_number
+        messages.success(self.request, f'Fire Truck #{truck_number} updated successfully!')
+        return super().form_valid(form)
+    
 class FiretruckDeleteView(DeleteView):
     model =  FireTruck
     template_name = 'firetruck_del.html'
     success_url = reverse_lazy('fireTruck-list')
     
-    
-## Firefighter Views
+    def form_valid(self, form):
+        truck_number = form.instance.truck_number
+        messages.success(self.request, f'Fire Truck #{truck_number} deleted successfully!')
+        return super().form_valid(form)
+
+# ======================
+# FIREFIGHTER VIEWS
+# ======================
 class FirefightersListView(ListView):
     model = Firefighters
     context_object_name = 'firefighters'
@@ -332,115 +376,111 @@ class FirefightersListView(ListView):
 class FirefightersCreateView(CreateView):
     model = Firefighters
     form_class = FirefightersForm
-    template_name = 'firefighter_add.html'
+    template_name = 'firefighter/firefighter_add.html'
     success_url = reverse_lazy('firefighters-list')
+
+    def form_valid(self, form):
+        name = form.instance.name
+        messages.success(self.request, f'Firefighter "{name}" created successfully!')
+        return super().form_valid(form)
 
 class FirefightersUpdateView(UpdateView):
     model = Firefighters
     form_class = FirefightersForm
-    template_name = 'firefighter_edit.html'
+    template_name = 'firefighter/firefighter_edit.html'
     success_url = reverse_lazy('firefighters-list')
 
+    def form_valid(self, form):
+        name = form.instance.name
+        messages.success(self.request, f'Firefighter "{name}" updated successfully!')
+        return super().form_valid(form)
+    
 class FirefightersDeleteView(DeleteView):
     model = Firefighters
     template_name = 'firefighter_del.html'
     success_url = reverse_lazy('firefighters-list')
     
-## Boat Views  
-class BoatCreateView(CreateView):
-    model = Boat
-    fields = "__all__"
-    template_name = "boats/boat_form.html"
-    success_url = reverse_lazy('boat-list')
-
-    def validate_dimensions(self, data):
-        """Centralized dimension validation logic"""
-        errors = []
-        for field in ['length', 'width', 'height']:
-            value = data.get(field)
-            try:
-                if float(value) <= 0:
-                    errors.append(f"{field.capitalize()} must be greater than 0.")
-            except (ValueError, TypeError):
-                errors.append(f"{field.capitalize()} must be a valid number.")
-        return errors
-
     def form_valid(self, form):
-        """Handle form validation with dimension checks"""
-        errors = self.validate_dimensions(form.cleaned_data)
-        if errors:
-            for error in errors:
-                messages.error(self.request, error)
-            return self.form_invalid(form)
-        
-        messages.success(self.request, "Boat created successfully!")
+        name = form.instance.name
+        messages.success(self.request, f'Firefighter "{name}" deleted successfully!')
         return super().form_valid(form)
 
-class BoatUpdateView(UpdateView):
-    model = Boat
-    fields = "__all__"
-    template_name = "boats/boat_form.html"
-    success_url = reverse_lazy('boat-list')
-
-    def validate_dimensions(self, data):
-        """Reuse the same validation logic as CreateView"""
-        errors = []
-        for field in ['length', 'width', 'height']:
-            value = data.get(field)
-            try:
-                if float(value) <= 0:
-                    errors.append(f"{field.capitalize()} must be greater than 0.")
-            except (ValueError, TypeError):
-                errors.append(f"{field.capitalize()} must be a valid number.")
-        return errors
-
-    def form_valid(self, form):
-        """Handle form validation with dimension checks"""
-        errors = self.validate_dimensions(form.cleaned_data)
-        if errors:
-            for error in errors:
-                messages.error(self.request, error)
-            return self.form_invalid(form)
-        
-        messages.success(self.request, "Boat updated successfully!")
-        return super().form_valid(form)
-    
-## Incident Views
-
+# ======================
+# INCIDENT VIEWS
+# ======================
 class IncidentListView(ListView):
     model = Incident
-    template_name = 'incidents/incident_list.html'
-    context_object_name = 'incidents'
-    
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        search_query = self.request.GET.get('q')
-        
-        if search_query:
-            queryset = queryset.filter(
-                Q(description__icontains=search_query) |
-                Q(severity_level__icontains=search_query) |
-                Q(location__name__icontains=search_query)
+    template_name = 'incident_list.html'
+    context_object_name = 'object_list'
+    paginate_by = 10
+
+    def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+        query = self.request.GET.get("q")
+        if query:
+            qs = qs.filter(
+                Q(description__icontains=query) |
+                Q(severity_level__icontains=query) |
+                Q(location__name__icontains=query) |  # Assuming Locations model has a 'name' field
+                Q(date_time__icontains=query)  # Assuming you want to search by date_time
             )
-        return queryset
+        return qs
+    
 
 class IncidentCreateView(CreateView):
     model = Incident
-    form_class =  Incident_Form
-    template_name= 'incident_add.html'
+    form_class = Incident_Form
+    template_name = 'incident/incident_add.html'
     success_url = reverse_lazy('incident-list')
-    
+
+    def form_valid(self, form):
+        description = form.instance.description[:50] + "..." if len(form.instance.description) > 50 else form.instance.description
+        messages.success(self.request, f'Incident "{description}" created successfully!')
+        return super().form_valid(form)
+
 class IncidentUpdateView(UpdateView):
     model = Incident
-    form_class =  Incident_Form
-    template_name= 'incident_edit.html'
+    form_class = Incident_Form
+    template_name = 'incident/incident_edit.html'
     success_url = reverse_lazy('incident-list')
-    
+
+    def form_valid(self, form):
+        description = form.instance.description[:50] + "..." if len(form.instance.description) > 50 else form.instance.description
+        messages.success(self.request, f'Incident "{description}" updated successfully!')
+        return super().form_valid(form)
+
 class IncidentDeleteView(DeleteView):
     model = Incident
     template_name= 'incident_del.html'
     success_url = reverse_lazy('incident-list')
-    
+
+    def form_valid(self, form):
+        description = form.instance.description[:50] + "..." if len(form.instance.description) > 50 else form.instance.description
+        messages.success(self.request, f'Incident "{description}" deleted successfully!')
+        return super().form_valid(form)
+
+
+# ======================
+# LOCATION VIEWS
+# ======================
+class IncidentListView(ListView):
+    model = Incident
+    template_name = 'incident_list.html'
+    context_object_name = 'object_list'
+    paginate_by = 10
+
+    def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+        query = self.request.GET.get("q")
+        if query:
+            qs = qs.filter(
+                Q(description__icontains=query) |
+                Q(severity_level__icontains=query) |
+                Q(location__name__icontains=query) |  # Assuming Locations model has a 'name' field
+                Q(date_time__icontains=query)  # Assuming you want to search by date_time
+            )
+        return qs
+
 class LocationListView(ListView):
     model = Locations
     template_name = 'loc_list.html'
@@ -458,40 +498,114 @@ class LocationListView(ListView):
                 Q(country__icontains=query)
             )
         return qs
-    
-## Location Views
 class LocationCreateView(CreateView):
     model = Locations
     form_class = Loc_Form
-    template_name= 'loc_add.html'
+    template_name = 'location/loc_add.html'
     success_url = reverse_lazy('loc-list')
-    
+
+    def form_valid(self, form):
+        name = form.instance.name
+        messages.success(self.request, f'Location "{name}" created successfully!')
+        return super().form_valid(form)
+
 class LocationUpdateView(UpdateView):
     model = Locations
     form_class = Loc_Form
-    template_name= 'loc_edit.html'
+    template_name = 'location/loc_edit.html'
     success_url = reverse_lazy('loc-list')
-    
+
+    def form_valid(self, form):
+        name = form.instance.name
+        messages.success(self.request, f'Location "{name}" updated successfully!')
+        return super().form_valid(form)
+
 class LocationDeleteView(DeleteView):
     model = Locations
     template_name= 'loc_del.html'
     success_url = reverse_lazy('loc-list')
+    
+    def form_valid(self, form):
+        name = form.instance.name
+        messages.success(self.request, f'Location "{name}" deleted successfully!')
+        return super().form_valid(form)
+# ======================
+# BOAT VIEWS
+# ======================
+class BoatListView(ListView):
+    model = Boat
+    template_name = "boats/boat_form.html"
+    context_object_name = "boats"
 
-class ConditionListView(ListView):
-    model = WeatherConditions
-    context_object_name = 'object_list'
-    template_name = 'weather_list.html'
-    paginate_by = 10
+    def get_search_filter(self, query):
+        return (Q(name__icontains=query) |
+                Q(boat_type__icontains=query) |
+                Q(status__icontains=query) |
+                Q(location__name__icontains=query))
 
-    def get_queryset(self, *args, **kwargs):
-        qs = super(ConditionListView, self).get_queryset(*args, **kwargs)
-        query = self.request.GET.get('q')
-        if query:
-            qs = qs.filter(
-                Q(incident__location__name__icontains=query) | 
-                Q(temperature__icontains=query) |
-                Q(humidity__icontains=query) |
-                Q(wind_speed__icontains=query) |
-                Q(weather_description__icontains=query)
-            )
-        return qs
+class BoatCreateView(BaseCreateView):
+    model = Boat
+    fields = "__all__"
+    template_name = "boats/boat_form.html"
+    success_url = reverse_lazy('boat-list')
+
+    def validate_dimensions(self, form_data):
+        errors = []
+        dimension_fields = ['length', 'width', 'height']
+        
+        for field in dimension_fields:
+            value = form_data.get(field)
+            try:
+                if float(value) <= 0:
+                    errors.append(f"{field.capitalize()} must be greater than 0.")
+            except (ValueError, TypeError):
+                errors.append(f"{field.capitalize()} must be a valid number.")
+        return errors
+
+    def form_valid(self, form):
+        errors = self.validate_dimensions(form.cleaned_data)
+        if errors:
+            for error in errors:
+                messages.error(self.request, error)
+            return self.form_invalid(form)
+        
+        boat_name = form.instance.name if form.instance.name else "New Boat"
+        messages.success(self.request, f'Boat "{boat_name}" was created successfully!')
+        return super().form_valid(form)
+
+class BoatUpdateView(BaseUpdateView):
+    model = Boat
+    fields = "__all__"
+    template_name = "boats/boat_form.html"
+    success_url = reverse_lazy('boat-list')
+
+    def validate_dimensions(self, form_data):
+        errors = []
+        dimension_fields = ['length', 'width', 'height']
+        
+        for field in dimension_fields:
+            value = form_data.get(field)
+            try:
+                if float(value) <= 0:
+                    errors.append(f"{field.capitalize()} must be greater than 0.")
+            except (ValueError, TypeError):
+                errors.append(f"{field.capitalize()} must be a valid number.")
+        return errors
+
+    def form_valid(self, form):
+        errors = self.validate_dimensions(form.cleaned_data)
+        if errors:
+            for error in errors:
+                messages.error(self.request, error)
+            return self.form_invalid(form)
+        
+        boat_name = form.instance.name if form.instance.name else "Boat"
+        messages.success(self.request, f'Boat "{boat_name}" was updated successfully!')
+        return super().form_valid(form)
+    
+def dashboard_chart(request):
+    """View for displaying dashboard charts"""
+    context = {
+        # You can add any context data needed for your dashboard
+    }
+    return render(request, 'dashboard/chart.html', context)
