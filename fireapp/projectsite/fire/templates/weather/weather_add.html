@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">
+                <i class="fas fa-cloud-sun me-2"></i>Add Weather Conditions
+            </h4>
+        </div>
+        <div class="card-body">
+            <form method="post" class="needs-validation" novalidate>
+                {% csrf_token %}
+                
+                <div class="row">
+                    <!-- Left Column -->
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="{{ form.incident.id_for_label }}" class="form-label">
+                                <i class="fas fa-fire me-1"></i>Related Incident
+                            </label>
+                            {{ form.incident }}
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="{{ form.temperature.id_for_label }}" class="form-label">
+                                <i class="fas fa-temperature-high me-1"></i>Temperature (°C)
+                            </label>
+                            {{ form.temperature }}
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="{{ form.humidity.id_for_label }}" class="form-label">
+                                <i class="fas fa-tint me-1"></i>Humidity (%)
+                            </label>
+                            {{ form.humidity }}
+                        </div>
+                    </div>
+                    
+                    <!-- Right Column -->
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="{{ form.wind_speed.id_for_label }}" class="form-label">
+                                <i class="fas fa-wind me-1"></i>Wind Speed (km/h)
+                            </label>
+                            {{ form.wind_speed }}
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="{{ form.weather_description.id_for_label }}" class="form-label">
+                                <i class="fas fa-comment-alt me-1"></i>Weather Description
+                            </label>
+                            {{ form.weather_description }}
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="{{ form.precipitation.id_for_label }}" class="form-label">
+                                <i class="fas fa-cloud-rain me-1"></i>Precipitation (mm)
+                            </label>
+                            {{ form.precipitation }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Buttons -->
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{% url 'weather-list' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-1"></i> Back to List
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> Save Conditions
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Optional: Form Validation Script -->
+<script>
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+</script>
+{% endblock %}
