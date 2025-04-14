@@ -1,11 +1,13 @@
 from django.urls import path
+from django.contrib import admin
+from django.conf import settings    
 from fire.views import (
     HomePageView, 
     ChartView, 
     PieCountbySeverity, 
     LineCountbyMonth,
     MultilineIncidentTop3Country, 
-    MultipleBarbySeverity, 
+    multipleBarbySeverity, 
     map_station,
     fire_incident_map,
     # Remove dashboard_chart if you're not using it
@@ -15,18 +17,23 @@ from fire.views import (
     IncidentListView, 
     IncidentCreateView, 
     IncidentUpdateView,
+    IncidentDeleteView,
     LocationListView, 
     LocationCreateView, 
     LocationUpdateView,
+    LocationDeleteView,
     ConditionListView, 
     ConditionCreateView, 
     ConditionUpdateView,
+    ConditionDeleteView,
     FiretruckListView, 
     FiretruckCreateView, 
     FiretruckUpdateView,
+    FiretruckDeleteView,
     FirefightersListView, 
     FirefightersCreateView, 
     FirefightersUpdateView,
+    FirefightersDeleteView,
     BoatListView, 
     BoatCreateView, 
     BoatUpdateView
@@ -34,51 +41,65 @@ from fire.views import (
 
 urlpatterns = [
     # Main views
+        path("admin/", admin.site.urls),
     path('', HomePageView.as_view(), name='home'),
-    path('chart/', ChartView.as_view(), name='chart'),
+    path('dashboard-chart', ChartView.as_view(), name='dashboard-chart'),
     
+
+
     # Chart data APIs
-    path('chart-data/severity', PieCountbySeverity, name='chart-data-severity'),
-    path('chart-data/month', LineCountbyMonth, name='chart-data-month'),
-    path('chart-data/top3country', MultilineIncidentTop3Country, name='chart-data-top3country'),
-    path('chart-data/multiplebar', MultipleBarbySeverity, name='chart-data-multiplebar'),
+    path('chart/', PieCountbySeverity, name='chart'),
+    path('lineChart/', LineCountbyMonth, name='chart'),
+    path('multilineChart/', MultilineIncidentTop3Country, name='chart'),
+    path('multiBarChart/', multipleBarbySeverity, name='chart'),
+    
     
     # Map views
-    path('map-station/', map_station, name='map-station'),
-    path('fire-incident-map/', fire_incident_map, name='fire-incident-map'),
+    path('stations/', map_station, name='map_station'), 
+    path('fire_incident_map/', fire_incident_map, name='fire_incidents_map'),
     
     # Fire Station URLs
-    path('stations/', FireStationListView.as_view(), name='station-list'),
-    path('station/create/', FireStationCreateView.as_view(), name='station-create'),
-    path('station/<int:pk>/update/', FireStationUpdateView.as_view(), name='station-update'),
+    path('stations/', FireStationListView.as_view(), name='station_list'),
+    path('station/create/', FireStationCreateView.as_view(), name='station_create'),
+    path('station/<int:pk>/update/', FireStationUpdateView.as_view(), name='station_update'),
     
     # Incident URLs
     path('incidents/', IncidentListView.as_view(), name='incident-list'),
-    path('incident/create/', IncidentCreateView.as_view(), name='incident-create'),
+    path('incident/create/', IncidentCreateView.as_view(), name='incident-add'),
     path('incident/<int:pk>/update/', IncidentUpdateView.as_view(), name='incident-update'),
+    path('incident_list/<pk>/delete/', IncidentDeleteView.as_view(), name='incident-delete'),
     
     # Location URLs
     path('locations/', LocationListView.as_view(), name='loc-list'),
-    path('location/create/', LocationCreateView.as_view(), name='loc-create'),
-    path('location/<int:pk>/update/', LocationUpdateView.as_view(), name='loc-update'),
+    path('location/create/', LocationCreateView.as_view(), name='location-add'),
+    path('location/<int:pk>/update/', LocationUpdateView.as_view(), name='location-update'),
+    path('location_list/<pk>/delete/', LocationDeleteView.as_view(), name='location-delete'),
     
     # Weather Condition URLs
     path('weather/', ConditionListView.as_view(), name='weather-list'),
-    path('weather/create/', ConditionCreateView.as_view(), name='weather-create'),
-    path('weather/<int:pk>/update/', ConditionUpdateView.as_view(), name='weather-update'),
+    path('weather/create/', ConditionCreateView.as_view(), name='weather_add'),
+    path('weather/<int:pk>/update/', ConditionUpdateView.as_view(), name='weather_update'),
     
     # Firetruck URLs
     path('firetrucks/', FiretruckListView.as_view(), name='fireTruck-list'),
-    path('firetruck/create/', FiretruckCreateView.as_view(), name='fireTruck-create'),
-    path('firetruck/<int:pk>/update/', FiretruckUpdateView.as_view(), name='fireTruck-update'),
+    path('firetruck/create/', FiretruckCreateView.as_view(), name='firetruck-add'),
+    path('firetruck/<int:pk>/update/', FiretruckUpdateView.as_view(), name='firetruck-update'),
+    path('firetruck_list/<pk>/delete/', FiretruckDeleteView.as_view(), name='firetruck-delete'),
     
     # Firefighters URLs
     path('firefighters/', FirefightersListView.as_view(), name='firefighters-list'),
-    path('firefighter/create/', FirefightersCreateView.as_view(), name='firefighters-create'),
+    path('firefighter/create/', FirefightersCreateView.as_view(), name='firefighters-add'),
     path('firefighter/<int:pk>/update/', FirefightersUpdateView.as_view(), name='firefighters-update'),
+    path('firefighters/<int:pk>/delete/', FirefightersDeleteView.as_view(), name='firefighters-delete'),
+    
+    # Condition URLs
+    path('condition_list/',  ConditionListView.as_view(), name='weather-list'),
+    path('condition_list/add', ConditionCreateView.as_view(), name='condition-add'),
+    path('condition_list/<pk>', ConditionUpdateView.as_view(), name='condition-update'),
+    path('condition_list/<pk>/delete/', ConditionDeleteView.as_view(), name='condition-delete'),
     
     # Boat URLs
-    path('boats/', BoatListView.as_view(), name='boat-list'),
-    path('boat/create/', BoatCreateView.as_view(), name='boat-create'),
-    path('boat/<int:pk>/update/', BoatUpdateView.as_view(), name='boat-update'),
+    path('boats/', BoatListView.as_view(), name='boat_list'),
+    path('boat/create/', BoatCreateView.as_view(), name='boat_add'),
+    path('boat/<int:pk>/update/', BoatUpdateView.as_view(), name='boat_update'),
 ]

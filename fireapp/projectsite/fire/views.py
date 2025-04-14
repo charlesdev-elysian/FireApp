@@ -118,7 +118,7 @@ def MultilineIncidentTop3Country(request):
 
     return JsonResponse({k: dict(sorted(v.items())) for k, v in result.items()})
 
-def MultipleBarbySeverity(request):
+def multipleBarbySeverity(request):
     query = '''
     SELECT 
         fi.severity_level,
@@ -523,7 +523,7 @@ class LocationUpdateView(UpdateView):
 class LocationDeleteView(DeleteView):
     model = Locations
     template_name= 'loc_del.html'
-    success_url = reverse_lazy('loc-list')
+    success_url = reverse_lazy('location-list')
     
     def form_valid(self, form):
         name = form.instance.name
