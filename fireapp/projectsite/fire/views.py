@@ -276,7 +276,7 @@ class ConditionListView(ListView):
 class ConditionCreateView(CreateView):
     model = WeatherConditions
     form_class = Weather_condition
-    template_name = 'weather/weather_add.html'
+    template_name = 'weather_add.html'
     success_url = reverse_lazy('weather-list')
 
     def form_valid(self, form):
@@ -287,7 +287,7 @@ class ConditionCreateView(CreateView):
 class ConditionUpdateView(UpdateView):
     model = WeatherConditions
     form_class = Weather_condition
-    template_name = 'weather/weather-update.html'
+    template_name = 'weather_edit.html'
     success_url = reverse_lazy('weather-list')
     context_object_name = 'weather'
 
@@ -326,16 +326,12 @@ class ConditionUpdateView(UpdateView):
 
 class ConditionDeleteView(DeleteView):
     model = WeatherConditions
-    template_name = 'weather/weather_del.html'
+    template_name = 'weather_del.html'
     success_url = reverse_lazy('weather-list')
     context_object_name = 'weather'
     
     def get_object(self, queryset=None):
-        """Override to add permission checks"""
         obj = super().get_object(queryset)
-        # Add any permission checks here if needed
-        # Example: if not self.request.user.can_delete_weather:
-        #     raise PermissionDenied
         return obj
     
     def form_valid(self, form):
@@ -354,6 +350,7 @@ class ConditionDeleteView(DeleteView):
                 f'Error deleting weather condition: {str(e)}'
             )
             return self.form_invalid(form)
+
 # ======================
 # FIRETRUCK VIEWS
 # ======================
@@ -378,14 +375,10 @@ class FiretruckListView(ListView):
 class FiretruckCreateView(CreateView):
     model = FireTruck
     form_class = Firetruckform
-    template_name = 'firetruck/firetruck_add.html'
+    template_name = 'firetruck_add.html'
     success_url = reverse_lazy('fireTruck-list')
 
     def dispatch(self, request, *args, **kwargs):
-        """Add permission check here if needed"""
-        # Example permission check:
-        # if not request.user.has_perm('firetruck.add_firetruck'):
-        #     raise PermissionDenied
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -414,15 +407,11 @@ class FiretruckCreateView(CreateView):
 class FiretruckUpdateView(UpdateView):
     model = FireTruck
     form_class = Firetruckform
-    template_name = 'firetruck/firetruck-update.html'
+    template_name = 'firetruck_edit.html'
     success_url = reverse_lazy('fireTruck-list')
     context_object_name = 'firetruck'
 
     def dispatch(self, request, *args, **kwargs):
-        """Add permission check here if needed"""
-        # Example permission check:
-        # if not request.user.has_perm('firetruck.change_firetruck'):
-        #     raise PermissionDenied
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -450,7 +439,7 @@ class FiretruckUpdateView(UpdateView):
     
 class FiretruckDeleteView(DeleteView):
     model = FireTruck
-    template_name = 'firetruck/firetruck_del.html'
+    template_name = 'firetruck_del.html'
     success_url = reverse_lazy('fireTruck-list')
     context_object_name = 'firetruck'
 
@@ -483,6 +472,7 @@ class FiretruckDeleteView(DeleteView):
 # ======================
 # FIREFIGHTER VIEWS
 # ======================
+
 class FirefightersListView(ListView):
     model = Firefighters
     context_object_name = 'firefighters'
@@ -499,7 +489,7 @@ class FirefightersListView(ListView):
 class FirefightersCreateView(CreateView):
     model = Firefighters
     form_class = FirefightersForm
-    template_name = 'firefighter/firefighter_add.html'
+    template_name = 'firefighter_add.html'
     success_url = reverse_lazy('firefighters-list')
 
     def form_valid(self, form):
@@ -510,7 +500,7 @@ class FirefightersCreateView(CreateView):
 class FirefightersUpdateView(UpdateView):
     model = Firefighters
     form_class = FirefightersForm
-    template_name = 'firefighter/firefighter-update.html'
+    template_name = 'firefighter_edit.html'
     success_url = reverse_lazy('firefighters-list')
 
     def form_valid(self, form):
@@ -521,7 +511,7 @@ class FirefightersUpdateView(UpdateView):
     
 class FirefightersDeleteView(DeleteView):
     model = Firefighters
-    template_name = 'firefighter/firefighter_del.html'
+    template_name = 'firefighter_del.html'
     success_url = reverse_lazy('firefighters-list')
     
     def delete(self, request, *args, **kwargs):
@@ -537,30 +527,20 @@ class FirefightersDeleteView(DeleteView):
 
 # ======================
 # INCIDENT VIEWS
-# ======================
+
 class IncidentListView(ListView):
     model = Incident
     template_name = 'incident_list.html'
-    context_object_name = 'object_list'
-    paginate_by = 10
+    paginate_by = 10  # Example pagination
 
-    def get_queryset(self, *args, **kwargs):
-        qs = super().get_queryset(*args, **kwargs)
-        query = self.request.GET.get("q")
-        if query:
-            qs = qs.filter(
-                Q(description__icontains=query) |
-                Q(severity_level__icontains=query) |
-                Q(location__name__icontains=query) |  # Assuming Locations model has a 'name' field
-                Q(date_time__icontains=query)  # Assuming you want to search by date_time
-            )
-        return qs
+    def get_queryset(self):
+        return Incident.objects.all().order_by('-id')
     
 
 class IncidentCreateView(CreateView):
     model = Incident
     form_class = Incident_Form
-    template_name = 'incident/incident-add.html'
+    template_name = 'incident_add.html'
     success_url = reverse_lazy('incident-list')
 
     def form_valid(self, form):
@@ -571,7 +551,7 @@ class IncidentCreateView(CreateView):
 class IncidentUpdateView(UpdateView):
     model = Incident
     form_class = Incident_Form
-    template_name = 'incident/incident-update.html'
+    template_name = 'incident_edit.html'
     success_url = reverse_lazy('incident-list')
 
     def form_valid(self, form):
@@ -581,7 +561,7 @@ class IncidentUpdateView(UpdateView):
 
 class IncidentDeleteView(DeleteView):
     model = Incident
-    template_name = 'incident/incident_del.html'  # Note the folder structure
+    template_name = 'incident_del.html'
     success_url = reverse_lazy('incident-list')
     context_object_name = 'incident'
 
@@ -600,6 +580,7 @@ class IncidentDeleteView(DeleteView):
 # ======================
 # LOCATION VIEWS
 # ======================
+
 class IncidentListView(ListView):
     model = Incident
     template_name = 'incident_list.html'
@@ -613,8 +594,8 @@ class IncidentListView(ListView):
             qs = qs.filter(
                 Q(description__icontains=query) |
                 Q(severity_level__icontains=query) |
-                Q(location__name__icontains=query) |  # Assuming Locations model has a 'name' field
-                Q(date_time__icontains=query)  # Assuming you want to search by date_time
+                Q(location__name__icontains=query) |
+                Q(date_time__icontains=query)
             )
         return qs
 
@@ -638,7 +619,7 @@ class LocationListView(ListView):
 class LocationCreateView(CreateView):
     model = Locations
     form_class = Loc_Form
-    template_name = 'location/loc_add.html'
+    template_name = 'loc_add.html'
     success_url = reverse_lazy('loc-list')
 
     def form_valid(self, form):
@@ -649,7 +630,7 @@ class LocationCreateView(CreateView):
 class LocationUpdateView(UpdateView):
     model = Locations
     form_class = Loc_Form
-    template_name = 'location/location-update.html'
+    template_name = 'loc_edit.html'
     success_url = reverse_lazy('loc-list')
 
     def form_valid(self, form):
@@ -659,7 +640,7 @@ class LocationUpdateView(UpdateView):
 
 class LocationDeleteView(DeleteView):
     model = Locations
-    template_name = 'location/loc_del.html'
+    template_name = 'loc_del.html'
     success_url = reverse_lazy('loc-list')
     context_object_name = 'location'
 
@@ -673,7 +654,7 @@ class LocationDeleteView(DeleteView):
         response = super().form_valid(form)
         messages.success(self.request, 
             f'Location "{name}" was successfully deleted.',
-            extra_tags='danger'  # Using danger to match the delete operation
+            extra_tags='danger'
         )
         return response
 # ======================
@@ -750,9 +731,13 @@ class BoatUpdateView(BaseUpdateView):
         messages.success(self.request, f'Boat "{boat_name}" was updated successfully!')
         return super().form_valid(form)
     
+    
+# ======================
+# DASHBOARD CHART
+# ======================
+    
 def dashboard_chart(request):
-    """View for displaying dashboard charts"""
     context = {
-        # You can add any context data needed for your dashboard
+
     }
     return render(request, 'dashboard/chart.html', context)
