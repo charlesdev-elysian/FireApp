@@ -41,7 +41,7 @@
         <!-- Header Section -->
         <div class="main-header">
             <!-- Logo Header -->
-            <div class="logo-header" data-background-color="orange">
+            <div class="logo-header" style="background-color: tomato;">
                 <a href="index.html" class="logo">
                     <img src="{% static 'img/logo.svg' %}" alt="FireApp Logo" class="navbar-brand">
                 </a>
@@ -62,7 +62,7 @@
             <!-- End Logo Header -->
 
             <!-- Navbar Header -->
-            <nav class="navbar navbar-header navbar-expand-lg" data-background-color="orange">
+            <nav class="navbar navbar-header navbar-expand-lg" style="background-color: tomato;">
                 <div class="container-fluid">
                     <div class="collapse" id="search-nav"></div>
                     <ul class="navbar-nav topbar-nav ml-md-auto align-items-center"></ul>
@@ -113,12 +113,7 @@
                                 <ul class="nav nav-collapse">
                                     <li>
                                     <a href="{% url 'dashboard-chart' %}">
-                                        <span class="sub-item">Dashboard 1</span>
-                                    </a>
-                                    </li>
-                                    <li>
-                                    <a href="{% url 'dashboard-chart' %}">
-                                        <span class="sub-item">Dashboard 2</span>
+                                        <span class="sub-item">Dashboard FireApp</span>
                                     </a>
                                     </li>
                                 </ul>
@@ -207,8 +202,7 @@
                             </a>
                             <div class="collapse" id="charts">
                                 <ul class="nav nav-collapse">
-                                    <li><a href="{% url 'dashboard-chart' %}"><span class="sub-item">Chart Js</span></a></li>
-                                    <li><a href="charts/sparkline.html"><span class="sub-item">Sparkline</span></a></li>
+                                    <li><a href="{% url 'dashboard-chart' %}"><span class="sub-item">Fire App Chart</span></a></li>
                                 </ul>
                             </div>
                         </li>
@@ -271,7 +265,7 @@
         const toastHTML = `
         <div class="toast" role="alert" style="margin-bottom: 10px; background-color: #007BFF; color: white;" data-delay="3000">
             <div class="toast-header" style="background-color: #0056b3; color: white;">
-                <img src="{% static 'img/sonic.svg' %}" class="rounded mr-2" 
+                <img src="{% static 'img/Pikachu.jpg' %}" class="rounded mr-2" 
                     style="width: 25px; height: 25px;" alt="logo">
                         <strong class="mr-auto">Notification</strong>
         <small>Just now</small>
