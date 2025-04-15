@@ -78,7 +78,9 @@ urlpatterns = [
     # Weather Condition URLs
     path('weather/', ConditionListView.as_view(), name='weather-list'),
     path('weather/create/', ConditionCreateView.as_view(), name='weather_add'),
-    path('weather/<int:pk>/update/', ConditionUpdateView.as_view(), name='weather_update'),
+    path('weather/<int:pk>/update/', ConditionUpdateView.as_view(), name='weather-update'),
+    path('weather/<int:pk>/delete/', ConditionDeleteView.as_view(), name='weather-delete'),
+    
     
     # Firetruck URLs
     path('firetrucks/', FiretruckListView.as_view(), name='fireTruck-list'),

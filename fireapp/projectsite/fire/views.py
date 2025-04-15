@@ -287,23 +287,73 @@ class ConditionCreateView(CreateView):
 class ConditionUpdateView(UpdateView):
     model = WeatherConditions
     form_class = Weather_condition
-    template_name = 'weather/weather_form.html'
+    template_name = 'weather/weather-update.html'
     success_url = reverse_lazy('weather-list')
+    context_object_name = 'weather'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = f"Update Weather Conditions - Record #{self.object.id}"
+        return context
 
     def form_valid(self, form):
-        location = form.instance.incident.location.name
-        messages.success(self.request, f'Weather condition for "{location}" updated successfully!')
-        return super().form_valid(form)
+        try:
+            response = super().form_valid(form)
+            location = form.instance.incident.location.name
+            messages.success(
+                self.request,
+                f'Successfully updated weather conditions for "{location}"',
+                extra_tags='alert-success'
+            )
+            return response
+        except Exception as e:
+            messages.error(
+                self.request,
+                f'Error updating weather conditions: {str(e)}',
+                extra_tags='alert-danger'
+            )
+            return self.form_invalid(form)
+
+    def form_invalid(self, form):
+        # Print form errors to console for debugging
+        print("Form errors:", form.errors)
+        messages.error(
+            self.request,
+            'Please correct the errors below.',
+            extra_tags='alert-danger'
+        )
+        return super().form_invalid(form)
 
 class ConditionDeleteView(DeleteView):
     model = WeatherConditions
-    template_name = 'weather_del.html'
+    template_name = 'weather/weather_del.html'
     success_url = reverse_lazy('weather-list')
+    context_object_name = 'weather'
     
-def form_valid(self, form):
-        location = form.instance.incident.location.name
-        messages.success(self.request, f'Weather condition for "{location}" deleted successfully!')
-        return super().form_valid(form)
+    def get_object(self, queryset=None):
+        """Override to add permission checks"""
+        obj = super().get_object(queryset)
+        # Add any permission checks here if needed
+        # Example: if not self.request.user.can_delete_weather:
+        #     raise PermissionDenied
+        return obj
+    
+    def form_valid(self, form):
+        try:
+            condition = self.object
+            condition_name = condition.condition_name
+            response = super().form_valid(form)
+            messages.success(
+                self.request, 
+                f'Weather condition "{condition_name}" was successfully deleted!'
+            )
+            return response
+        except Exception as e:
+            messages.error(
+                self.request,
+                f'Error deleting weather condition: {str(e)}'
+            )
+            return self.form_invalid(form)
 # ======================
 # FIRETRUCK VIEWS
 # ======================
@@ -331,31 +381,104 @@ class FiretruckCreateView(CreateView):
     template_name = 'firetruck/firetruck_add.html'
     success_url = reverse_lazy('fireTruck-list')
 
+    def dispatch(self, request, *args, **kwargs):
+        """Add permission check here if needed"""
+        # Example permission check:
+        # if not request.user.has_perm('firetruck.add_firetruck'):
+        #     raise PermissionDenied
+        return super().dispatch(request, *args, **kwargs)
+
     def form_valid(self, form):
-        truck_number = form.instance.truck_number
-        messages.success(self.request, f'Fire Truck #{truck_number} created successfully!')
-        return super().form_valid(form)
+        try:
+            response = super().form_valid(form)
+            truck_number = form.instance.truck_number
+            messages.success(
+                self.request, 
+                f'Fire Truck #{truck_number} was successfully created!',
+                extra_tags='success'
+            )
+            return response
+        except Exception as e:
+            messages.error(
+                self.request,
+                f'Error creating fire truck: {str(e)}',
+                extra_tags='danger'
+            )
+            return self.form_invalid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = 'Add New Fire Truck'
+        return context
 
 class FiretruckUpdateView(UpdateView):
     model = FireTruck
     form_class = Firetruckform
-    template_name = 'firetruck/firetruck_edit.html'
+    template_name = 'firetruck/firetruck-update.html'
     success_url = reverse_lazy('fireTruck-list')
+    context_object_name = 'firetruck'
+
+    def dispatch(self, request, *args, **kwargs):
+        """Add permission check here if needed"""
+        # Example permission check:
+        # if not request.user.has_perm('firetruck.change_firetruck'):
+        #     raise PermissionDenied
+        return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
-        truck_number = form.instance.truck_number
-        messages.success(self.request, f'Fire Truck #{truck_number} updated successfully!')
-        return super().form_valid(form)
+        try:
+            response = super().form_valid(form)
+            truck_number = form.instance.truck_number
+            messages.success(
+                self.request,
+                f'Fire Truck #{truck_number} was successfully updated!',
+                extra_tags='success'
+            )
+            return response
+        except Exception as e:
+            messages.error(
+                self.request,
+                f'Error updating fire truck: {str(e)}',
+                extra_tags='danger'
+            )
+            return self.form_invalid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = f'Update Fire Truck #{self.object.truck_number}'
+        return context
     
 class FiretruckDeleteView(DeleteView):
-    model =  FireTruck
-    template_name = 'firetruck_del.html'
+    model = FireTruck
+    template_name = 'firetruck/firetruck_del.html'
     success_url = reverse_lazy('fireTruck-list')
-    
+    context_object_name = 'firetruck'
+
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = f'Delete Fire Truck #{self.object.truck_number}'
+        return context
+
     def form_valid(self, form):
-        truck_number = form.instance.truck_number
-        messages.success(self.request, f'Fire Truck #{truck_number} deleted successfully!')
-        return super().form_valid(form)
+        try:
+            truck_number = self.object.truck_number
+            response = super().form_valid(form)
+            messages.success(
+                self.request,
+                f'Fire Truck #{truck_number} was successfully deleted!',
+                extra_tags='success'
+            )
+            return response
+        except Exception as e:
+            messages.error(
+                self.request,
+                f'Error deleting fire truck: {str(e)}',
+                extra_tags='danger'
+            )
+            return self.form_invalid(form)
 
 # ======================
 # FIREFIGHTER VIEWS
@@ -387,23 +510,30 @@ class FirefightersCreateView(CreateView):
 class FirefightersUpdateView(UpdateView):
     model = Firefighters
     form_class = FirefightersForm
-    template_name = 'firefighter/firefighter_edit.html'
+    template_name = 'firefighter/firefighter-update.html'
     success_url = reverse_lazy('firefighters-list')
 
     def form_valid(self, form):
         name = form.instance.name
         messages.success(self.request, f'Firefighter "{name}" updated successfully!')
         return super().form_valid(form)
+
     
 class FirefightersDeleteView(DeleteView):
     model = Firefighters
-    template_name = 'firefighter_del.html'
+    template_name = 'firefighter/firefighter_del.html'
     success_url = reverse_lazy('firefighters-list')
     
-    def form_valid(self, form):
-        name = form.instance.name
-        messages.success(self.request, f'Firefighter "{name}" deleted successfully!')
-        return super().form_valid(form)
+    def delete(self, request, *args, **kwargs):
+        firefighter = self.get_object()
+        name = firefighter.name
+        response = super().delete(request, *args, **kwargs)
+        messages.success(
+            request,
+            f'Firefighter "{name}" was deleted successfully!',
+            extra_tags='toast success'
+        )
+        return response
 
 # ======================
 # INCIDENT VIEWS
@@ -519,7 +649,7 @@ class LocationCreateView(CreateView):
 class LocationUpdateView(UpdateView):
     model = Locations
     form_class = Loc_Form
-    template_name = 'location/loc_edit.html'
+    template_name = 'location/location-update.html'
     success_url = reverse_lazy('loc-list')
 
     def form_valid(self, form):
@@ -529,13 +659,23 @@ class LocationUpdateView(UpdateView):
 
 class LocationDeleteView(DeleteView):
     model = Locations
-    template_name= 'loc_del.html'
-    success_url = reverse_lazy('location-list')
-    
+    template_name = 'location/loc_del.html'
+    success_url = reverse_lazy('loc-list')
+    context_object_name = 'location'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = f"Delete Location #{self.object.id}"
+        return context
+
     def form_valid(self, form):
-        name = form.instance.name
-        messages.success(self.request, f'Location "{name}" deleted successfully!')
-        return super().form_valid(form)
+        name = self.object.name
+        response = super().form_valid(form)
+        messages.success(self.request, 
+            f'Location "{name}" was successfully deleted.',
+            extra_tags='danger'  # Using danger to match the delete operation
+        )
+        return response
 # ======================
 # BOAT VIEWS
 # ======================

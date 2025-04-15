@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="firefighter-update-container">
+    <h2>Update Firefighter</h2>
+    <form method="post" id="firefighter-update-form" class="firefighter-form">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Update</button>
+        <a href="{% url 'firefighters-list' %}" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Form submission handling
+      const form = document.getElementById('firefighter-update-form');
+      
+      if (form) {
+        form.addEventListener('submit', function(e) {
+          // You can add client-side validation here
+          const nameField = form.querySelector('#id_name');
+          if (nameField && !nameField.value.trim()) {
+            e.preventDefault();
+            alert('Please enter a name for the firefighter');
+            nameField.focus();
+            return false;
+          }
+          
+          // Show loading state
+          const submitButton = form.querySelector('button[type="submit"]');
+          if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Updating...';
+          }
+          
+          return true;
+        });
+      }
+
+      // Add Bootstrap validation classes
+      const inputs = document.querySelectorAll('.firefighter-form input, .firefighter-form select, .firefighter-form textarea');
+      inputs.forEach(input => {
+        input.classList.add('form-control');
+      });
+
+      // Style labels
+      const labels = document.querySelectorAll('.firefighter-form label');
+      labels.forEach(label => {
+        label.classList.add('form-label');
+      });
+    });
+  </script>
+
+  <style>
+    .firefighter-update-container {
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .firefighter-form {
+      margin-top: 20px;
+    }
+    
+    .firefighter-form p {
+      margin-bottom: 15px;
+    }
+    
+    .form-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    
+    .btn {
+      padding: 8px 16px;
+      border-radius: 4px;
+      text-decoration: none;
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+    
+    .btn-primary {
+      background-color: #007bff;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background-color: #0069d9;
+    }
+    
+    .btn-secondary {
+      background-color: #6c757d;
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background-color: #5a6268;
+    }
+    
+    .form-control {
+      display: block;
+      width: 100%;
+      padding: 8px 12px;
+      font-size: 1rem;
+      line-height: 1.5;
+      color: #495057;
+      background-color: #fff;
+      background-clip: padding-box;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+    
+    .form-control:focus {
+      border-color: #80bdff;
+      outline: 0;
+      box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+    }
+    
+    .form-label {
+      display: inline-block;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+  </style>
+{% endblock %}
