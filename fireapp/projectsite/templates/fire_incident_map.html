@@ -3,20 +3,84 @@
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
 <style>
-#city-select {
-    width: 150px; /* Adjust width as needed */
-}
+    /* Improved dropdown and controls styling */
+    .map-controls {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+        align-items: center;
+    }
 
-#map {
-    width: 100%;
-    height: 65vh;
-    border-radius: 10px;
-    border-top: 5px solid rgb(108, 23, 235); /* Change the color here */
-    border-bottom: 5px solid rgb(108, 23, 235); /* Change the color here */
-    position: relative;
-    outline: none;
-}
+    #city-select {
+        width: 200px;
+        padding: 8px 12px;
+        border: 2px solid #6c17eb;
+        border-radius: 6px;
+        background-color: white;
+        font-size: 14px;
+        color: #333;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+
+    #city-select:focus {
+        outline: none;
+        border-color: #3a0ca3;
+        box-shadow: 0 0 0 3px rgba(108, 23, 235, 0.2);
+    }
+
+    #goButton {
+        padding: 8px 20px;
+        background-color: #6c17eb;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    #goButton:hover {
+        background-color: #3a0ca3;
+        transform: translateY(-1px);
+    }
+
+    /* Map styling */
+    #map {
+        width: 100%;
+        height: 65vh;
+        border-radius: 8px;
+        border: 2px solid #6c17eb;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    /* Card improvements */
+    .card {
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .card-header {
+        background-color: #6c17eb;
+        color: white;
+        border-bottom: none;
+    }
+
+    .card-title {
+        font-weight: 600;
+    }
+
+    .card-category a {
+        color: #b8d1ff;
+        text-decoration: none;
+    }
+
+    .card-category a:hover {
+        text-decoration: underline;
+    }
 </style>
+
 <div class="page-inner">
     <div class="page-header">
         <h4 class="page-title">Dashboard</h4>
@@ -42,22 +106,22 @@
     </div>
     <div class="row">
         <div class="col-md-12">
-            <div class="card card-transparent">
+            <div class="card">
                 <div class="card-header">
                     <h4 class="card-title text-center">Fire Incidents</h4>
                     <p class="card-category text-center">Categorize by city and explore incidents. Developed by our partners at <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>.</p>
                 </div>
                 <div class="card-body">
                     <div class="col-md-12">
-                        <!-- Dropdown for selecting city and Go button -->
-                        <div class="dropdown-container">
-                            <select id="city-select" style="border-radius: 5px; border-top: 3px solid rgb(114, 150, 228); background-color: aliceblue;">
+                        <!-- Improved dropdown container -->
+                        <div class="map-controls">
+                            <select id="city-select">
                                 <option value="" selected disabled>Select City</option>
                                 <!-- Dropdown options will be populated dynamically -->
                             </select>
-                            <button id="goButton" type="submit" style="border-radius: 5px; border: none; background-color: rgb(54, 124, 255); color: white;">Go</button>
+                            <button id="goButton" type="submit">Go</button>
                         </div>
-                        <div id="map" style="width: 100%; height: 400px"></div>
+                        <div id="map"></div>
                     </div>
                 </div>
             </div>
