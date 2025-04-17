@@ -339,19 +339,15 @@ class ConditionDeleteView(DeleteView):
     template_name = 'weather_del.html'
     success_url = reverse_lazy('weather-list')
     context_object_name = 'weather'
-    
-    def get_object(self, queryset=None):
-        obj = super().get_object(queryset)
-        return obj
-    
+
     def form_valid(self, form):
         try:
-            condition = self.object
-            condition_name = condition.condition_name
+            # Fixed: Using self.object instead of form.instance
+            location = self.object.incident.location.name
             response = super().form_valid(form)
             messages.success(
                 self.request, 
-                f'Weather condition "{condition_name}" was successfully deleted!'
+                f'Weather condition "{location}" was successfully deleted!'
             )
             return response
         except Exception as e:
@@ -359,11 +355,11 @@ class ConditionDeleteView(DeleteView):
                 self.request,
                 f'Error deleting weather condition: {str(e)}'
             )
-            return self.form_invalid(form)
+            return super().form_invalid(form)
         
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['weather_list'] = self.success_url  # Pass the cancel URL to template
+        context['weather_list'] = self.success_url
         return context
 
 # ======================
