@@ -254,37 +254,95 @@
 
     <!-- Toast Notification System -->
     <div id="toast-container" aria-live="polite" aria-atomic="true" 
-        style="position: fixed; bottom: 20px; right: 20px; z-index: 1050">
-        <!-- Toasts will be dynamically inserted here -->
-    </div>
+    style="position: fixed; bottom: 20px; right: 20px; z-index: 1050; min-width: 300px;">
+    
+</div>
 
     {% if messages %}
     <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        {% for message in messages %}
-        const toastHTML = `
-        <div class="toast" role="alert" style="margin-bottom: 10px; background-color: #007BFF; color: white;" data-delay="3000">
-            <div class="toast-header" style="background-color: #0056b3; color: white;">
-                <img src="{% static 'img/Pikachu_nbg.png' %}" class="rounded mr-2" 
-                    style="width: 25px; height: 25px;" alt="logo">
-                        <strong class="mr-auto">Notification</strong>
-        <small>Just now</small>
-                    <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
-                    <span aria-hidden="true" style="color: white;">&times;</span>
-        </button>
-        </div>
-                    <div class="toast-body">
-            {{ message|escapejs }}
-            </div>
-        </div>`;
-
-        document.getElementById('toast-container').insertAdjacentHTML('beforeend', toastHTML);
-        const toastElement = document.getElementById('toast-container').lastElementChild;
-        const toast = new bootstrap.Toast(toastElement);
-        toast.show();
-        {% endfor %}
-    });
-    </script>
+        document.addEventListener("DOMContentLoaded", function() {
+            {% for message in messages %}
+            const toastType = '{{ message.tags }}' || 'info';
+            const iconColors = {
+                'info': 'filter: invert(55%) sepia(98%) saturate(748%) hue-rotate(183deg) brightness(99%) contrast(94%)',
+                'success': 'filter: invert(67%) sepia(31%) saturate(925%) hue-rotate(81deg) brightness(91%) contrast(90%)',
+                'warning': 'filter: invert(80%) sepia(85%) saturate(459%) hue-rotate(349deg) brightness(102%) contrast(104%)',
+                'error': 'filter: invert(44%) sepia(45%) saturate(1352%) hue-rotate(318deg) brightness(91%) contrast(96%)'
+            };
+            
+            const toastHTML = `
+            <div class="toast fade show ${toastType}" role="alert" aria-live="assertive" aria-atomic="true"
+                style="margin-bottom: 15px; opacity: 0; transform: translateY(20px); transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);">
+                <div class="toast-header" 
+                    style="background: ${toastType === 'info' ? 'linear-gradient(135deg, #007BFF 0%, #0056b3 100%)' : 
+                            toastType === 'success' ? 'linear-gradient(135deg, #28a745 0%, #1e7e34 100%)' :
+                            toastType === 'warning' ? 'linear-gradient(135deg, #ffc107 0%, #fd7e14 100%)' :
+                            'linear-gradient(135deg, #dc3545 0%, #a71d2a 100%)'};
+                            color: white; border-radius: 8px 8px 0 0; padding: 12px 15px;">
+                    <img src="{% static 'img/Pikachu_nbg.png' %}" class="rounded mr-2" 
+                        style="width: 25px; height: 25px; ${iconColors[toastType] || ''}" alt="Notification Icon">
+                    <strong class="mr-auto">${toastType.charAt(0).toUpperCase() + toastType.slice(1)}</strong>
+                    <small class="text-white-50">Just now</small>
+                    <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close"
+                            style="color: white; opacity: 0.8; font-size: 1.5rem; line-height: 1;">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="toast-body" 
+                    style="background-color: white; color: #212529; border-radius: 0 0 8px 8px;
+                            padding: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                            border-left: 4px solid ${toastType === 'info' ? '#007BFF' : 
+                                        toastType === 'success' ? '#28a745' :
+                                        toastType === 'warning' ? '#ffc107' : '#dc3545'};">
+                    {{ message|escapejs }}
+                </div>
+            </div>`;
+        
+            document.getElementById('toast-container').insertAdjacentHTML('beforeend', toastHTML);
+            
+            // Trigger the animation
+            setTimeout(() => {
+                const toastElement = document.getElementById('toast-container').lastElementChild;
+                toastElement.style.opacity = '1';
+                toastElement.style.transform = 'translateY(0)';
+                
+                // Initialize Bootstrap toast
+                const toast = new bootstrap.Toast(toastElement, { delay: 5000 });
+                toast.show();
+                
+                // Handle manual close
+                toastElement.querySelector('.close').addEventListener('click', () => {
+                    toastElement.style.opacity = '0';
+                    toastElement.style.transform = 'translateY(20px)';
+                    setTimeout(() => toastElement.remove(), 300);
+                });
+            }, 50);
+            {% endfor %}
+        });
+        </script>
+        
+        <style>
+            /* Custom animations */
+            .toast {
+                transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55) !important;
+            }
+            
+            /* Hover effects */
+            .toast:hover {
+                transform: translateY(-3px) !important;
+                box-shadow: 0 6px 16px rgba(0,0,0,0.2) !important;
+            }
+            
+            /* Responsive adjustments */
+            @media (max-width: 576px) {
+                #toast-container {
+                    right: 10px;
+                    left: 10px;
+                    min-width: auto;
+                    max-width: 100%;
+                }
+            }
+        </style>
     {% endif %}
 </body>
 </html>
