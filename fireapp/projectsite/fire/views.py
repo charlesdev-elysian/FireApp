@@ -369,18 +369,21 @@ class FiretruckListView(ListView):
     model = FireTruck
     context_object_name = 'firetruck'
     template_name = 'firetruck_list.html'
-    paginate_by = 10 
-    
-    
+    paginate_by = 10
+    ordering = ['-id']  # Default ordering by newest first
+
     def get_queryset(self, *args, **kwargs):
         qs = super().get_queryset(*args, **kwargs)
         query = self.request.GET.get("q")
+        
         if query:
-            qs = qs.filter(Q(truck_number__icontains=query) | 
-            Q(model__icontains=query) | 
-            Q(capacity__icontains=query) | 
-            Q(station__name__icontains=query))
-
+            qs = qs.filter(
+                Q(truck_number__icontains=query) | 
+                Q(model__icontains=query) | 
+                Q(capacity__icontains=query) | 
+                Q(station__name__icontains=query)
+            ).order_by('-id')  # Maintain ordering with search results
+            
         return qs
 
 class FiretruckCreateView(CreateView):
@@ -568,14 +571,16 @@ class FirefightersDeleteView(DeleteView):
 
 # ======================
 # INCIDENT VIEWS
+# ======================
 
 class IncidentListView(ListView):
     model = Incident
     template_name = 'incident_list.html'
-    paginate_by = 10  # Example pagination
-
+    paginate_by = 10
+    ordering = ['-reported_date']  # explicit view-level ordering
+    
     def get_queryset(self):
-        return Incident.objects.all().order_by('-id')
+        return super().get_queryset().select_related('location')
     
 
 class IncidentCreateView(CreateView):
