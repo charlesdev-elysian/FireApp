@@ -283,6 +283,11 @@ class ConditionCreateView(CreateView):
         location = form.instance.incident.location.name
         messages.success(self.request, f'Weather condition for "{location}" created successfully!')
         return super().form_valid(form)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['weather_list'] = self.success_url  # Pass the cancel URL to template
+        return context
 
 class ConditionUpdateView(UpdateView):
     model = WeatherConditions
@@ -323,6 +328,11 @@ class ConditionUpdateView(UpdateView):
             extra_tags='alert-danger'
         )
         return super().form_invalid(form)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['weather_list'] = self.success_url  # Pass the cancel URL to template
+        return context
 
 class ConditionDeleteView(DeleteView):
     model = WeatherConditions
@@ -350,6 +360,11 @@ class ConditionDeleteView(DeleteView):
                 f'Error deleting weather condition: {str(e)}'
             )
             return self.form_invalid(form)
+        
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['weather_list'] = self.success_url  # Pass the cancel URL to template
+        return context
 
 # ======================
 # FIRETRUCK VIEWS
@@ -403,6 +418,11 @@ class FiretruckCreateView(CreateView):
         context = super().get_context_data(**kwargs)
         context['page_title'] = 'Add New Fire Truck'
         return context
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['firetruck_list'] = self.success_url  # Pass the cancel URL to template
+        return context
 
 class FiretruckUpdateView(UpdateView):
     model = FireTruck
@@ -437,6 +457,11 @@ class FiretruckUpdateView(UpdateView):
         context['page_title'] = f'Update Fire Truck #{self.object.truck_number}'
         return context
     
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['firetruck_list'] = self.success_url  # Pass the cancel URL to template
+        return context
+    
 class FiretruckDeleteView(DeleteView):
     model = FireTruck
     template_name = 'firetruck_del.html'
@@ -468,6 +493,11 @@ class FiretruckDeleteView(DeleteView):
                 extra_tags='danger'
             )
             return self.form_invalid(form)
+        
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['firetruck_list'] = self.success_url  # Pass the cancel URL to template
+        return context
 
 # ======================
 # FIREFIGHTER VIEWS
@@ -496,6 +526,11 @@ class FirefightersCreateView(CreateView):
         name = form.instance.name
         messages.success(self.request, f'Firefighter "{name}" created successfully!')
         return super().form_valid(form)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['firefighter_list'] = self.success_url  # Pass the cancel URL to template
+        return context
 
 class FirefightersUpdateView(UpdateView):
     model = Firefighters
@@ -507,6 +542,11 @@ class FirefightersUpdateView(UpdateView):
         name = form.instance.name
         messages.success(self.request, f'Firefighter "{name}" updated successfully!')
         return super().form_valid(form)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['firefighter_list'] = self.success_url  # Pass the cancel URL to template
+        return context
 
     
 class FirefightersDeleteView(DeleteView):
@@ -514,16 +554,21 @@ class FirefightersDeleteView(DeleteView):
     template_name = 'firefighter_del.html'
     success_url = reverse_lazy('firefighters-list')
     
-    def delete(self, request, *args, **kwargs):
+    def form_valid(self, form):
         firefighter = self.get_object()
         name = firefighter.name
-        response = super().delete(request, *args, **kwargs)
+        response = super().form_valid(form)
         messages.success(
-            request,
+            self.request,
             f'Firefighter "{name}" was deleted successfully!',
             extra_tags='toast success'
         )
         return response
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['firefighter_list'] = self.success_url
+        return context
 
 # ======================
 # INCIDENT VIEWS
@@ -547,6 +592,11 @@ class IncidentCreateView(CreateView):
         description = form.instance.description[:50] + "..." if len(form.instance.description) > 50 else form.instance.description
         messages.success(self.request, f'Incident "{description}" created successfully!')
         return super().form_valid(form)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['incident_list'] = self.success_url  # Pass the cancel URL to template
+        return context
 
 class IncidentUpdateView(UpdateView):
     model = Incident
@@ -558,6 +608,11 @@ class IncidentUpdateView(UpdateView):
         description = form.instance.description[:50] + "..." if len(form.instance.description) > 50 else form.instance.description
         messages.success(self.request, f'Incident "{description}" updated successfully!')
         return super().form_valid(form)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['incident_list'] = self.success_url  # Pass the cancel URL to template
+        return context
 
 class IncidentDeleteView(DeleteView):
     model = Incident
@@ -575,6 +630,11 @@ class IncidentDeleteView(DeleteView):
         description = self.object.description[:50] + "..." if len(self.object.description) > 50 else self.object.description
         messages.success(self.request, f'Successfully deleted incident: "{description}"')
         return response
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['incident_list'] = self.success_url  # Pass the cancel URL to template
+        return context
 
 
 # ======================
@@ -626,6 +686,11 @@ class LocationCreateView(CreateView):
         name = form.instance.name
         messages.success(self.request, f'Location "{name}" created successfully!')
         return super().form_valid(form)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['loc_list'] = self.success_url  # Pass the cancel URL to template
+        return context
 
 class LocationUpdateView(UpdateView):
     model = Locations
@@ -637,6 +702,11 @@ class LocationUpdateView(UpdateView):
         name = form.instance.name
         messages.success(self.request, f'Location "{name}" updated successfully!')
         return super().form_valid(form)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['loc_list'] = self.success_url  # Pass the cancel URL to template
+        return context
 
 class LocationDeleteView(DeleteView):
     model = Locations
@@ -657,6 +727,11 @@ class LocationDeleteView(DeleteView):
             extra_tags='danger'
         )
         return response
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['loc_list'] = self.success_url  # Pass the cancel URL to template
+        return context
 # ======================
 # BOAT VIEWS
 # ======================
